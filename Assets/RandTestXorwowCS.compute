@@ -1,0 +1,26 @@
+﻿#pragma kernel Calc
+#pragma kernel Draw
+
+#include "Assets/Packages/Xorwow/Xorwow.cginc"
+
+struct RandData{
+	XorwowState seed;
+	float current;
+};
+
+RWStructuredBuffer<RandData> _RandData;
+
+float rand()
+{
+	const uint UINT_MAX = 0xffffffff;
+
+	RandData data = _RandData[0];
+	float result = (float)XorwowRandom(data.seed) / UINT_MAX;
+	data.current = result;
+
+	_RandData[0] = data;
+	return result;
+}
+
+#include "RandTest.cginc"
+

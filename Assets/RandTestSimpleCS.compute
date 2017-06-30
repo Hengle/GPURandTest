@@ -1,0 +1,32 @@
+﻿#pragma kernel Calc
+#pragma kernel Draw
+
+struct RandData{
+	uint seed;
+	float current;
+};
+
+RWStructuredBuffer<RandData> _RandData;
+
+float randSimple(float2 v)
+{
+    return frac(sin(dot(v.xy, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+float rand()
+{
+	const uint UINT_MAX = 0xffffffff;
+
+	RandData data = _RandData[0];
+	float result = randSimple(float2((float)data.seed / UINT_MAX, (float)data.seed / UINT_MAX)); 
+
+	data.current = result;
+	data.seed = (uint)(result * UINT_MAX);
+
+	_RandData[0] = data;
+
+	return result;
+}
+
+#include "RandTest.cginc"
+
